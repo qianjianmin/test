@@ -10,7 +10,7 @@ find-process-mode: off # always/strict/off
 mode: rule
 log-level: warning # 日志等级 silent/error/warning/info/debug
 ipv6: true # 开启 IPv6 总开关，关闭阻断所有 IPv6 链接和屏蔽 DNS 请求 AAAA 记录
-external-controller: 0.0.0.0:9090 # RESTful API 监听地址
+external-controller: 0.0.0.0:9999 # RESTful API 监听地址
 # secret: "qjm123" # `Authorization:Bearer ${secret}`
 # 配置 WEB UI 目录，使用 http://{{external-controller}}/ui 访问
 external-ui: /tmp/mnt/sda1/ui/
