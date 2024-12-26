@@ -6,22 +6,17 @@ bind-address: "*" # 绑定 IP 地址，仅作用于 allow-lan 为 true，'*'表�
 lan-allowed-ips: # 允许连接的 IP 地址段，仅作用于 allow-lan 为 true, 默认值为 0.0.0.0/0 和::/0
   - 0.0.0.0/0
   - ::/0
-#  find-process-mode has 3 values:always, strict, off
-#  - always, 开启，强制匹配所有进程
-#  - strict, 默认，由 mihomo 判断是否开启
-#  - off, 不匹配进程，推荐在路由器上使用此模式
-find-process-mode: off
+find-process-mode: off # always/strict/off
 mode: rule
 log-level: warning # 日志等级 silent/error/warning/info/debug
 ipv6: true # 开启 IPv6 总开关，关闭阻断所有 IPv6 链接和屏蔽 DNS 请求 AAAA 记录
 external-controller: 0.0.0.0:9999 # RESTful API 监听地址
  secret: "qjm123" # `Authorization:Bearer ${secret}`
 # 配置 WEB UI 目录，使用 http://{{external-controller}}/ui 访问
-external-ui: /tmp/mnt/sda1/ui/
-external-ui-name: xd
-external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+external-ui: /tmp/mnt/sda1/ui/xd/
+external-ui-name: panel
+external-ui-url: "https://gitproxy.click/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 proxies:
-
 proxy-providers:
   provider1:
     type: http
@@ -31,14 +26,13 @@ proxy-providers:
     proxy: DIRECT
     header:
       User-Agent:
-      - "mihomo/1.19.0"
+      - "mihomo/1.18.3"
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 3600
       timeout: 5000
       lazy: true
-
   provider2:
     type: http
     url: "http://csgo3.fask511.cfd:1588/api/v1/client/subscribe?token=48f52989eb0cd95659fe560b26b0fc1b"
@@ -47,22 +41,20 @@ proxy-providers:
     proxy: DIRECT
     header:
       User-Agent:
-      - "mihomo/1.19.0"
+      - "mihomo/1.18.3"
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 3600
       timeout: 5000
       lazy: true
-
 proxy-groups:
 - name: "全局"
   type: select
   proxies:
+  - DIRECT
   - 自动
   - 手动
-  - DIRECT
-
 - name: "自动"
   type: url-test
   use:
@@ -72,21 +64,18 @@ proxy-groups:
   interval: 1800
   tolerance: 50
   lazy: true
-
 - name: "手动"
   type: select
   use:
   - provider1
   - provider2
-
 rule-providers:
   cn:
     behavior: domain
     interval: 86400
     path: ./tmp/mnt/sda1/provider/rule-set/cn_domain.yaml
     type: http
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"
-
+    url: "https://gitproxy.click/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"
 rules:
   - RULE-SET,cn,DIRECT
   - GEOSITE,category-ads-all,REJECT
@@ -96,6 +85,7 @@ rules:
   - GEOSITE,twitter,全局
   - GEOSITE,pixiv,全局
   - GEOSITE,category-scholar-!cn,全局
+  - GEOSITE,bilibili,DIRECT
   - GEOSITE,onedrive,DIRECT
   - GEOSITE,microsoft@cn,DIRECT
   - GEOSITE,apple-cn,DIRECT
@@ -103,7 +93,6 @@ rules:
   - GEOSITE,category-games@cn,DIRECT
   - GEOSITE,geolocation-!cn,全局
   - GEOSITE,cn,DIRECT
-  #GEOIP 规则
   - GEOIP,private,DIRECT,no-resolve
   - GEOIP,telegram,全局
   - GEOIP,JP,全局
