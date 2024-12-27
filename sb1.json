@@ -1,0 +1,191 @@
+{
+  "log": {
+    "level": "info",
+    "output": "sing-box.log",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "cloudflare",
+        "address": "tls://1.1.1.1",
+        "detour": "Proxy"
+      },
+      {
+        "tag": "fakedns",
+        "address": "fakeip"
+      },
+      {
+        "tag": "local",
+        "address": "https://1.12.12.12/dns-query",
+        "detour": "direct"
+      },
+      {
+        "tag": "block",
+        "address": "rcode://success"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "local",
+        "disable_cache": true
+      },
+      {
+        "clash_mode": "Global",
+        "server": "cloudflare"
+      },
+      {
+        "clash_mode": "Direct",
+        "server": "local"
+      },
+      {
+        "geosite": "category-ads-all",
+        "server": "block"
+      },
+      {
+        "geosite": [
+          "cn",
+          "apple@cn",
+          "category-games@cn",
+          "private"
+        ],
+        "domain_keyword": "ntp",
+        "server": "local"
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakedns"
+      }
+    ],
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
+    "independent_cache": true,
+    "strategy": "prefer_ipv4"
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "sniff": true
+    },
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "::",
+      "listen_port": 1536,
+      "sniff": true
+    }
+  ],
+  "outbound_providers": [
+    {
+      "tag": "provider1",
+      "type": "http",
+      "download_url": "http://filusdt.461553.best:1588/api/v1/client/subscribe?token=eee240ff74735fef164d93e856f56866",
+      "download_interval": "24h",
+      "path": "provider1.txt",
+      "healthcheck_interval": "1h",
+      "download_ua": "v2ray",
+      "download_detour": "Proxy"
+    },
+    {
+      "tag": "provider2",
+      "type": "http",
+      "download_url": "http://csgo3.fask511.cfd:1588/api/v1/client/subscribe?token=48f52989eb0cd95659fe560b26b0fc1b",
+      "download_interval": "24h",
+      "path": "provider2.txt",
+      "healthcheck_interval": "1h",
+      "download_ua": "v2ray",
+      "download_detour": "Proxy"
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "selector",
+      "tag": "Proxy",
+      "providers": [
+        "provider1",
+        "provider2"
+      ],
+      "outbounds": [
+        "direct"
+      ],
+      "default": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules":[
+          {
+            "port":53
+          },
+          {
+            "protocol": "dns"
+          }
+        ],
+        "outbound": "dns-out"
+      },
+      {
+        "clash_mode": "Global",
+        "outbound": "Proxy"
+      },
+      {
+        "clash_mode": "Direct",
+        "outbound": "direct"
+      },
+      {
+        "geosite": "category-ads-all",
+        "outbound": "block"
+      },
+      {
+        "geosite": [
+          "apple@cn",
+          "category-games@cn",
+          "private",
+          "cn"
+        ],
+        "outbound":"direct"
+      },
+      {
+        "geoip": [
+          "cn",
+          "private"
+        ],
+        "outbound": "direct"
+      }
+    ],
+    "find_process": true,
+    "final": "Proxy"
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "0.0.0.0:9999",
+      "external_ui": "ui",
+      "store_selected": true,
+      "store_fakeip": true
+    }
+  }
+}
